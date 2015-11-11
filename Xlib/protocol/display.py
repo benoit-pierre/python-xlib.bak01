@@ -28,6 +28,7 @@ import socket
 # Xlib modules
 from Xlib import error
 from Xlib.ext import ge
+from Xlib.X import KeymapNotify
 
 from Xlib.support import lock, connect
 
@@ -786,7 +787,10 @@ class Display:
         # Decrement it by one, so that we don't remove the request
         # that generated these events, if there is such a one.
         # Bug reported by Ilpo Nyyssönen
-        self.get_waiting_request((e.sequence_number - 1) % 65536)
+        # Note: take care of handling the special case
+        # of KeymapNotify events: no sequence number!
+        if etype != KeymapNotify:
+            self.get_waiting_request((e.sequence_number - 1) % 65536)
 
         # print 'recv Event:', e
 
